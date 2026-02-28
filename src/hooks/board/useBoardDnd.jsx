@@ -340,7 +340,9 @@ export function useBoardDnd({
           onSuccess: () => (isMutating.current = false),
           onError: () => (isMutating.current = false),
           onSettled: () =>
-            queryClient.invalidateQueries(["listsWithCards", Number(boardId)]),
+            queryClient.invalidateQueries({
+              queryKey: ["listsWithCards", Number(boardId)],
+            }),
         },
       );
       resetRefs();
@@ -361,7 +363,9 @@ export function useBoardDnd({
         const cardIndex = inboxIds.indexOf(activeId);
 
         const latestInboxCards =
-          queryClient.getQueryData(["inboxCards", Number(boardId)]) ?? [];
+          queryClient.getQueryData({
+            queryKey: ["inboxCards", Number(boardId)],
+          }) ?? [];
 
         const latestInboxList = latestInboxCards.filter(
           (card) => card.id !== activeId,
@@ -385,11 +389,12 @@ export function useBoardDnd({
             onError: () => (isMutating.current = false),
             onSettled: async () => {
               await Promise.all([
-                queryClient.invalidateQueries(["inboxCards", Number(boardId)]),
-                queryClient.invalidateQueries([
-                  "listsWithCards",
-                  Number(boardId),
-                ]),
+                queryClient.invalidateQueries({
+                  queryKey: ["inboxCards", Number(boardId)],
+                }),
+                queryClient.invalidateQueries({
+                  queryKey: ["listsWithCards", Number(boardId)],
+                }),
               ]);
               isDragging.current = false;
             },
@@ -441,11 +446,12 @@ export function useBoardDnd({
             onError: () => (isMutating.current = false),
             onSettled: async () => {
               await Promise.all([
-                queryClient.invalidateQueries(["inboxCards", Number(boardId)]),
-                queryClient.invalidateQueries([
-                  "listsWithCards",
-                  Number(boardId),
-                ]),
+                queryClient.invalidateQueries({
+                  queryKey: ["inboxCards", Number(boardId)],
+                }),
+                queryClient.invalidateQueries({
+                  queryKey: ["listsWithCards", Number(boardId)],
+                }),
               ]);
               isDragging.current = false;
             },
@@ -476,11 +482,12 @@ export function useBoardDnd({
           onError: () => (isMutating.current = false),
           onSettled: async () => {
             await Promise.all([
-              queryClient.invalidateQueries(["inboxCards", Number(boardId)]),
-              queryClient.invalidateQueries([
-                "listsWithCards",
-                Number(boardId),
-              ]),
+              queryClient.invalidateQueries({
+                queryKey: ["inboxCards", Number(boardId)],
+              }),
+              queryClient.invalidateQueries({
+                queryKey: ["listsWithCards", Number(boardId)],
+              }),
             ]);
             isDragging.current = false;
           },

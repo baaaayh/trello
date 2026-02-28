@@ -66,7 +66,7 @@ export const useAddList = (boardId) => {
       }
       console.error("리스트 추가 실패 : ", error.message);
     },
-    onSettled: (data, error, variables, context) => {
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey });
     },
   });

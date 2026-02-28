@@ -46,7 +46,7 @@ const Header = ({ divide }) => {
             </span>
           </button>
           <h1 className="logo">
-            <a href="./">{divide ? <LogoDefault /> : <LogoWhite />}</a>
+            <a href="/">{divide ? <LogoDefault /> : <LogoWhite />}</a>
           </h1>
         </div>
         <div className="search-box max-w-[860px] w-full">

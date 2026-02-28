@@ -154,8 +154,12 @@ export const useMoveCardInInbox = (boardId) => {
     },
 
     onSettled: () => {
-      queryClient.invalidateQueries(["listsWithCards", numericBoardId]);
-      queryClient.invalidateQueries(["inboxCards", numericBoardId]);
+      queryClient.invalidateQueries({
+        queryKey: ["listsWithCards", numericBoardId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["inboxCards", numericBoardId],
+      });
     },
   });
 };

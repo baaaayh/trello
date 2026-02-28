@@ -9,8 +9,6 @@ export const useDeleteArchivedItem = () => {
       // itemType이 "list"면 lists 테이블, 아니면 cards 테이블에서 삭제
       const table = itemType === "lists" ? "lists" : "cards";
 
-      console.log(table, id);
-
       const { data, error } = await supabase
         .from(table)
         .update({ deleted_at: new Date().toISOString() })

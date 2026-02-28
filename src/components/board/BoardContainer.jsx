@@ -162,7 +162,7 @@ const BoardContainer = ({ user, data }) => {
                 onMouseDown={handleMouseDown}
                 className="h-full bg-white/50 hover:bg-white/80 rounded-full cursor-pointer transition-colors"
                 style={{
-                  width: thumbWidth,
+                  width: thumbWidth - 48,
                   transform: `translateX(${thumbLeft}px)`,
                 }}
               />
