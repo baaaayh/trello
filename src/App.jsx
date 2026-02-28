@@ -12,7 +12,7 @@ import {
 } from "@dnd-kit/core";
 import { Routes, Route, useLocation, matchPath } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
-import { useCardsRealtime } from "@/src/hooks/card/useCardsRealtime";
+import { useCardsRealtime } from "@/src/hooks/realtime/useRealtime";
 import { useBoardDnd } from "@/src/hooks/board/useBoardDnd";
 import { useUserProfile } from "@/src/hooks/useUserProfile";
 import { useMoveList } from "@/src/hooks/list/useMoveList";
