@@ -4,7 +4,6 @@ import { calcPosition } from "@/src/utils/calcPosition";
 
 const INBOX_ID = "inbox";
 
-// 데이터 정규화 헬퍼 함수
 const normalize = (listsData, inboxCards) => {
   const containers = { [INBOX_ID]: [] };
   const cardsById = {};
