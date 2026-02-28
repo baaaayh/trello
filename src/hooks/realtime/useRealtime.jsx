@@ -35,6 +35,9 @@ export const useRealtime = (boardId, userId) => {
           queryClient.invalidateQueries({
             queryKey: ["listsWithCards", numericBoardId],
           });
+          queryClient.invalidateQueries({
+            queryKey: ["lists", numericBoardId],
+          });
         },
       )
       .on(
