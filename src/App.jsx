@@ -12,6 +12,7 @@ import {
 } from "@dnd-kit/core";
 import { Routes, Route, useLocation, matchPath } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
+import { useCardsRealtime } from "@/src/hooks/card/useCardsRealtime";
 import { useBoardDnd } from "@/src/hooks/board/useBoardDnd";
 import { useUserProfile } from "@/src/hooks/useUserProfile";
 import { useMoveList } from "@/src/hooks/list/useMoveList";
@@ -54,6 +55,8 @@ function App() {
   const moveListMutation = useMoveList();
   const moveCardMutation = useMoveCard();
   const moveCardInInboxMutation = useMoveCardInInbox(boardId);
+
+  useCardsRealtime(boardId);
 
   const { session, setSession, setUser } = useAuthStore();
   const { divide, leftWidth, setLeftWidth } = useDivideStatusStore();

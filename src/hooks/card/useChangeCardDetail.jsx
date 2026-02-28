@@ -51,7 +51,6 @@ export const useChangeCardDetail = (boardId, listId, cardId) => {
         }),
       });
 
-      // 낙관적 업데이트 로직 (동일)
       if (previousLists) {
         queryClient.setQueryData(listQueryKey, (old) =>
           old.map((list) => ({
@@ -91,21 +90,18 @@ export const useChangeCardDetail = (boardId, listId, cardId) => {
       if (context?.previousCard)
         queryClient.setQueryData(["card", numericCardId], context.previousCard);
     },
-    onSuccess: (updatedCard) => {
-      // ✅ 서버에서 받아온 실제 데이터로 캐시를 최종 업데이트 (서버 응답 구조에 맞게)
-      queryClient.setQueryData(["inboxCards", numericBoardId], (old) => {
-        return old?.map((card) =>
-          card.id === updatedCard.id ? updatedCard : card,
-        );
+    onSettled: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["listsWithCards", numericBoardId],
       });
-
-      queryClient.setQueryData(["listsWithCards", numericBoardId], (old) => {
-        return old?.map((list) => ({
-          ...list,
-          cards: list.cards?.map((card) =>
-            card.id === updatedCard.id ? updatedCard : card,
-          ),
-        }));
+      queryClient.invalidateQueries({
+        queryKey: ["inboxCards", numericBoardId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["card", numericCardId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["archivedCards"],
       });
     },
   });

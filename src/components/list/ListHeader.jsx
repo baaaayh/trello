@@ -35,7 +35,9 @@ const ListHeader = ({
       e.preventDefault();
       mutate(
         { listId: data.id, newTitle: listTitleVal },
-        { onError: () => setListTitleVal(data.title) },
+        {
+          onError: () => setListTitleVal(data.title),
+        },
       );
       setIsEditing(false);
     }
@@ -68,7 +70,7 @@ const ListHeader = ({
             ref={titleButtonTextRef}
             className="list-title__button"
           >
-            {data.title}
+            {listTitleVal}
           </span>
         </button>
         <textarea
