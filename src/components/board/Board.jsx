@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   SortableContext,
   horizontalListSortingStrategy,
@@ -6,26 +6,10 @@ import {
 
 import List from "@/src/components/list/List";
 import AddListButton from "@/src/components/board/AddListButton";
-import { supabase } from "@/src/lib/supabaseClient";
 const Board = ({ data }) => {
   const { isLoading, listIds, lists, boardId, boardSlug, lastPosition } = data;
 
   const [isShow, setIsShow] = useState(false);
-
-  useEffect(() => {
-    const channel = supabase
-      .channel("test-lists-direct")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "lists" },
-        (payload) => {
-          console.log("lists 직접 테스트!!!", payload);
-        },
-      )
-      .subscribe((status) => console.log("lists 직접 상태:", status));
-
-    return () => supabase.removeChannel(channel);
-  }, []);
 
   return (
     <div className="board">
