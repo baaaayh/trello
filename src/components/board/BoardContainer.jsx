@@ -129,8 +129,8 @@ const BoardContainer = ({ user, data }) => {
               <div
                 style={{
                   backgroundImage: currentBoardBg
-                    ? `url('/src/assets/images/${currentBoardBg}.svg')`
-                    : `url('/src/assets/images/rainbow.svg')`,
+                    ? `url('/images/${currentBoardBg}.svg')`
+                    : `url('/images/rainbow.svg')`,
                 }}
                 className="min-w-max h-full pt-2 px-1 pb-18 bg-cover bg-center"
               >
