@@ -47,8 +47,6 @@ const ListHeader = ({
     }
   }
 
-  console.log(data);
-
   return (
     <div
       className="board-list__header flex justify-between align-center"

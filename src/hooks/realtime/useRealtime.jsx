@@ -46,12 +46,14 @@ export const useRealtime = (boardId, userId) => {
         "postgres_changes",
         { event: "*", schema: "public", table: "cards" },
         (p) => {
-          console.log("CARD 변경 :::", p);
+          queryClient.invalidateQueries({
+            queryKey: ["inboxCards", numericBoardId],
+            refetchType: "active",
+          });
           queryClient.invalidateQueries({
             queryKey: ["listsWithCards", numericBoardId],
             refetchType: "active",
           });
-
           // 상세 카드는 ID가 일치할 때만 갱신
           if (p.new?.id) {
             queryClient.invalidateQueries({
