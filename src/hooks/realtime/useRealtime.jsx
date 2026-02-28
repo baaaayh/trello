@@ -11,7 +11,12 @@ export const useRealtime = (boardId, userId) => {
 
     // 💡 채널 이름에 랜덤 값을 더해 중복 충돌 방지
     const channelName = `combined-realtime-${numericBoardId}-${Math.random().toString(36).substring(7)}`;
-    const mainChannel = supabase.channel(channelName);
+    const mainChannel = supabase.channel(channelName, {
+      config: {
+        broadcast: { self: true }, // 내 변경사항도 내가 받을지 선택
+        presence: { key: userId },
+      },
+    });
 
     mainChannel
       .on(
