@@ -56,10 +56,6 @@ const CardEdit = ({ data, title, position, onClose, onSave, boardSlug }) => {
       },
       {
         onSettled: () => {
-          queryClient.invalidateQueries({ queryKey: ["archivedCards"] });
-          queryClient.invalidateQueries({
-            queryKey: ["listsWithCards", Number(boardId)],
-          });
           onClose();
         },
       },

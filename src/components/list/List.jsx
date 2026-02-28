@@ -95,9 +95,10 @@ const LIST_COLORS = [
 const List = ({ data, boardId, boardSlug, cards }) => {
   const [activeAddCardArea, setActiveAddCardArea] = useState(null);
   const [anchorEl, setAnchorEl] = useState(null);
-  const [listColor, setListColor] = useState(
-    LIST_COLORS.find((c) => c.name === data.color) || LIST_COLORS[0],
-  );
+
+  const listColor = useMemo(() => {
+    return LIST_COLORS.find((c) => c.name === data.color) || LIST_COLORS[0];
+  }, [data.color]);
 
   const addCardTextAreaRef = useRef(null);
   const topAddCardTextAreaRef = useRef(null);
@@ -159,21 +160,9 @@ const List = ({ data, boardId, boardSlug, cards }) => {
   }
 
   function changeListColor(c) {
-    mutate(
-      {
-        color: c,
-      },
-      {
-        onSuccess: () => {
-          setListColor(LIST_COLORS.find((x) => x.name === c) || LIST_COLORS[0]);
-        },
-        onError: () => {
-          setListColor(
-            LIST_COLORS.find((x) => x.name === data.color) || LIST_COLORS[0],
-          );
-        },
-      },
-    );
+    mutate({
+      color: c,
+    });
   }
 
   return (

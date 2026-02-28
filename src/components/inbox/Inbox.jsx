@@ -148,20 +148,28 @@ const Inbox = ({ data }) => {
                 )}
                 <div className="card-list flex-1 mt-2">
                   <SortableContext
-                    items={inboxList?.map((card) => card.id) ?? []}
+                    items={
+                      inboxList
+                        ?.filter((card) => !card.is_archived)
+                        .map((card) => card.id) ?? []
+                    }
                     strategy={verticalListSortingStrategy}
                   >
                     <ul>
-                      {inboxList && inboxList.length > 0 ? (
-                        inboxList.map((card) => (
-                          <li key={card.id} className="mb-2">
-                            <Card
-                              data={card}
-                              boardSlug={boardSlug}
-                              isInbox={true}
-                            />
-                          </li>
-                        ))
+                      {inboxList &&
+                      inboxList.filter((card) => !card.is_archived).length >
+                        0 ? (
+                        inboxList
+                          .filter((card) => !card.is_archived)
+                          .map((card) => (
+                            <li key={card.id} className="mb-2">
+                              <Card
+                                data={card}
+                                boardSlug={boardSlug}
+                                isInbox={true}
+                              />
+                            </li>
+                          ))
                       ) : (
                         <NoCard />
                       )}
