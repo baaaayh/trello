@@ -23,6 +23,26 @@ const AddListButton = ({ isShow, setIsShow, boardId, lastPosition }) => {
     setTextAreaVal("");
   }
 
+  function handleKeyDown(e) {
+    const prevTitle = textAreaVal;
+    if (e.key === "Enter") {
+      e.preventDefault();
+      mutate(
+        {
+          listTitle: textAreaVal,
+          lastPosition,
+        },
+        {
+          onError: () => setTextAreaVal(prevTitle),
+          onSuccess: () => setTextAreaVal(""),
+        },
+      );
+    }
+    if (e.key === "Escape") {
+      setIsShow(false);
+    }
+  }
+
   return (
     <li className="px-2 w-[272px]">
       <div
@@ -36,6 +56,7 @@ const AddListButton = ({ isShow, setIsShow, boardId, lastPosition }) => {
               className="bg-white w-full"
               value={textAreaVal}
               onChange={(e) => setTextAreaVal(e.target.value)}
+              onKeyDown={handleKeyDown}
             ></textarea>
           </div>
           <div className="add-list__button">

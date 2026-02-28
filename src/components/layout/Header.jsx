@@ -77,18 +77,6 @@ const Header = ({ divide }) => {
         </div>
         <div className="user">
           <ul className="inline-flex justify-between items-center gap-x-2">
-            <li className="inline-flex align-center">
-              <button type="button" className="promotion-button cursor-pointer">
-                <div className="promotion-button__wrapper inline-flex gap-x-2 justify-between items-center px-3 py-1.5 bg-promotion-grad rounded-md">
-                  <span className="promotion-button__icon">
-                    <TwinkleIcon />
-                  </span>
-                  <span className="promotion-button__text text-sm font-bold text-white">
-                    14 days left
-                  </span>
-                </div>
-              </button>
-            </li>
             {HeaderUserMenu.map((item, index) => (
               <li key={index} className="inline-flex align-center">
                 <HeaderUserButton

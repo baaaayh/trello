@@ -3,6 +3,7 @@ import {
   SortableContext,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
+import useDivideStatusStore from "@/src/store/useDivideStatusStore";
 import { useLocation, matchPath } from "react-router-dom";
 import { useDroppable } from "@dnd-kit/core";
 import InboxIcon from "@/src/components/common/floatNavIcons/InboxIcon";
@@ -19,6 +20,11 @@ const Inbox = ({ data }) => {
   const [isAdding, setIsAdding] = useState(false);
   const [title, setTitle] = useState("");
   const inputRef = useRef(null);
+
+  const {
+    divide,
+    divideStatus: { inbox },
+  } = useDivideStatusStore();
 
   // URL 파라미터 추출
   const match =
@@ -59,11 +65,11 @@ const Inbox = ({ data }) => {
   };
 
   return (
-    <div className="inbox-container w-full h-full">
+    <div className="inbox-container w-full h-full overflow-hidden">
       <div className="inbox-container__gutter h-full">
         <div
           ref={setNodeRef}
-          className="inbox h-full rounded-[20px] bg-[#e9f2fee6] border border-black/24 "
+          className={`inbox h-full bg-[#e9f2fee6]  ${divide && inbox ? "border border-black/24 rounded-[20px] overflow-hidden" : ""}`}
         >
           <div className="inbox__wrapper flex flex-col h-full p-4">
             <div className="inbox__header">

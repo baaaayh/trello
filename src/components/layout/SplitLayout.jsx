@@ -123,13 +123,7 @@ function SplitLayout({ left, right, divide, leftWidth, setLeftWidth }) {
         </div>
       )}
 
-      <div
-        className={`flex-1 min-w-0 transition-all duration-300 ${
-          divide ? "rounded-[20px]" : ""
-        }`}
-      >
-        {right}
-      </div>
+      <div className="flex-1 min-w-0 transition-all duration-300">{right}</div>
     </div>
   );
 }

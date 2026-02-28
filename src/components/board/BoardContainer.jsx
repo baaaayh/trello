@@ -18,7 +18,10 @@ const BoardContainer = ({ user, data }) => {
   const [thumbWidth, setThumbWidth] = useState(40);
   const [thumbLeft, setThumbLeft] = useState(0);
 
-  const { divide } = useDivideStatusStore();
+  const {
+    divide,
+    divideStatus: { board },
+  } = useDivideStatusStore();
 
   const isDragging = useRef(false);
   const startX = useRef(0);
@@ -105,7 +108,7 @@ const BoardContainer = ({ user, data }) => {
 
   return (
     <div
-      className={`content-area relative flex flex-col h-full ${divide ? "rounded-[20px] overflow-hidden" : ""}`}
+      className={`content-area relative flex flex-col h-full ${divide && board ? "rounded-[20px] overflow-hidden" : ""}`}
     >
       {isLoading ? (
         <span className="text-white font-bold">Loading...</span>
