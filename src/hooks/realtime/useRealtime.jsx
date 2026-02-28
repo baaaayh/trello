@@ -34,9 +34,11 @@ export const useRealtime = (boardId, userId) => {
           console.log("LIST 변경 :::", p);
           queryClient.invalidateQueries({
             queryKey: ["listsWithCards", numericBoardId],
+            refetchType: "all",
           });
           queryClient.invalidateQueries({
             queryKey: ["lists", numericBoardId],
+            refetchType: "all",
           });
         },
       )
@@ -47,10 +49,15 @@ export const useRealtime = (boardId, userId) => {
           console.log("CARD 변경 :::", p);
           queryClient.invalidateQueries({
             queryKey: ["listsWithCards", numericBoardId],
+            refetchType: "active",
           });
-          queryClient.invalidateQueries({
-            queryKey: ["inboxCards", numericBoardId],
-          });
+
+          // 상세 카드는 ID가 일치할 때만 갱신
+          if (p.new?.id) {
+            queryClient.invalidateQueries({
+              queryKey: ["card", Number(p.new.id)],
+            });
+          }
         },
       )
       .on(

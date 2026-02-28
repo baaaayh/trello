@@ -46,6 +46,9 @@ export const useMoveList = () => {
       queryClient.invalidateQueries({
         queryKey: ["listsWithCards", Number(variables.boardId)],
       });
+      queryClient.invalidateQueries({
+        queryKey: ["lists", Number(variables.boardId)],
+      });
     },
   });
 };

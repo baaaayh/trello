@@ -335,10 +335,12 @@ export function useBoardDnd({
         {
           onSuccess: () => (isMutating.current = false),
           onError: () => (isMutating.current = false),
-          onSettled: () =>
+          onSettled: () => {
             queryClient.invalidateQueries({
               queryKey: ["listsWithCards", Number(boardId)],
-            }),
+            });
+            isDragging.current = false;
+          },
         },
       );
       resetRefs();
