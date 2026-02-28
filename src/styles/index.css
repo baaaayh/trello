@@ -1,0 +1,146 @@
+@import "tailwindcss";
+@theme {
+  --text-base: 14px;
+  --text-base--line-height: 1.5rem;
+  --color-nav-border: #091e4224;
+  --color-button-primary: #0c66e4;
+  --background-image-promotion-grad: linear-gradient(
+    79.47deg,
+    var(--ds-background-discovery-bold, #6e5dc6) 25.62%,
+    var(--ds-text-selected, #0c66e4) 99.57%
+  );
+  --color-dynamic-bg: hsla(250, 47.9%, 45.7%, 0.9);
+  --color-board-header-background-color: rgba(0, 0, 0, 0.24);
+  --color-icon-primary-color: #803fa5;
+  --ds-background-accent-lime-subtlest: #efffd6;
+  --ds-background-accent-lime-subtlest-hovered: #d3f1a7;
+  --ds-background-accent-lime-subtlest-pressed: #bde97c;
+  --ds-background-accent-lime-subtler: #d3f1a7;
+  --ds-background-accent-lime-subtler-hovered: #bde97c;
+  --ds-background-accent-lime-subtler-pressed: #b3df72;
+  --ds-background-accent-lime-subtle: #94c748;
+  --ds-background-accent-lime-subtle-hovered: #b3df72;
+  --ds-background-accent-lime-subtle-pressed: #bde97c;
+  --ds-background-accent-lime-bolder: #5b7f24;
+  --ds-background-accent-lime-bolder-hovered: #4c6b1f;
+  --ds-background-accent-lime-bolder-pressed: #3f5224;
+  --ds-background-accent-red-subtlest: #ffeceb;
+  --ds-background-accent-red-subtlest-hovered: #ffd5d2;
+  --ds-background-accent-red-subtlest-pressed: #ffb8b2;
+  --ds-background-accent-red-subtler: #ffd5d2;
+  --ds-background-accent-red-subtler-hovered: #ffb8b2;
+  --ds-background-accent-red-subtler-pressed: #fd9891;
+  --ds-background-accent-red-subtle: #f87168;
+  --ds-background-accent-red-subtle-hovered: #fd9891;
+  --ds-background-accent-red-subtle-pressed: #ffb8b2;
+  --ds-background-accent-red-bolder: #c9372c;
+  --ds-background-accent-red-bolder-hovered: #ae2e24;
+  --ds-background-accent-red-bolder-pressed: #872821;
+  --ds-background-accent-orange-subtlest: #fff5db;
+  --ds-background-accent-orange-subtlest-hovered: #fce4a6;
+  --ds-background-accent-orange-subtlest-pressed: #fbd779;
+  --ds-background-accent-orange-subtler: #fce4a6;
+  --ds-background-accent-orange-subtler-hovered: #fbd779;
+  --ds-background-accent-orange-subtler-pressed: #fbc828;
+  --ds-background-accent-orange-subtle: #fca700;
+  --ds-background-accent-orange-subtle-hovered: #fbc828;
+  --ds-background-accent-orange-subtle-pressed: #fbd779;
+  --ds-background-accent-orange-bolder: #bd5b00;
+  --ds-background-accent-orange-bolder-hovered: #9e4c00;
+  --ds-background-accent-orange-bolder-pressed: #7a3b00;
+  --ds-background-accent-yellow-subtlest: #fef7c8;
+  --ds-background-accent-yellow-subtlest-hovered: #f5e989;
+  --ds-background-accent-yellow-subtlest-pressed: #efdd4e;
+  --ds-background-accent-yellow-subtler: #f5e989;
+  --ds-background-accent-yellow-subtler-hovered: #efdd4e;
+  --ds-background-accent-yellow-subtler-pressed: #eed12b;
+  --ds-background-accent-yellow-subtle: #eed12b;
+  --ds-background-accent-yellow-subtle-hovered: #ddb30e;
+  --ds-background-accent-yellow-subtle-pressed: #efdd4e;
+  --ds-background-accent-yellow-bolder: #946f00;
+  --ds-background-accent-yellow-bolder-hovered: #7f5f01;
+  --ds-background-accent-yellow-bolder-pressed: #614a05;
+  --ds-background-accent-green-subtlest: #dcfff1;
+  --ds-background-accent-green-subtlest-hovered: #baf3db;
+  --ds-background-accent-green-subtlest-pressed: #97edc9;
+  --ds-background-accent-green-subtler: #baf3db;
+  --ds-background-accent-green-subtler-hovered: #97edc9;
+  --ds-background-accent-green-subtler-pressed: #7ee2b8;
+  --ds-background-accent-green-subtle: #4bce97;
+  --ds-background-accent-green-subtle-hovered: #7ee2b8;
+  --ds-background-accent-green-subtle-pressed: #97edc9;
+  --ds-background-accent-green-bolder: #1f845a;
+  --ds-background-accent-green-bolder-hovered: #216e4e;
+  --ds-background-accent-green-bolder-pressed: #19573d;
+  --ds-background-accent-teal-subtlest: #e7f9ff;
+  --ds-background-accent-teal-subtlest-hovered: #c6edfb;
+  --ds-background-accent-teal-subtlest-pressed: #b1e4f7;
+  --ds-background-accent-teal-subtler: #c6edfb;
+  --ds-background-accent-teal-subtler-hovered: #b1e4f7;
+  --ds-background-accent-teal-subtler-pressed: #9dd9ee;
+  --ds-background-accent-teal-subtle: #6cc3e0;
+  --ds-background-accent-teal-subtle-hovered: #9dd9ee;
+  --ds-background-accent-teal-subtle-pressed: #b1e4f7;
+  --ds-background-accent-teal-bolder: #227d9b;
+  --ds-background-accent-teal-bolder-hovered: #206a83;
+  --ds-background-accent-teal-bolder-pressed: #1a5265;
+  --ds-background-accent-blue-subtlest: #e9f2fe;
+  --ds-background-accent-blue-subtlest-hovered: #cfe1fd;
+  --ds-background-accent-blue-subtlest-pressed: #adcbfb;
+  --ds-background-accent-blue-subtler: #cfe1fd;
+  --ds-background-accent-blue-subtler-hovered: #adcbfb;
+  --ds-background-accent-blue-subtler-pressed: #8fb8f6;
+  --ds-background-accent-blue-subtle: #669df1;
+  --ds-background-accent-blue-subtle-hovered: #8fb8f6;
+  --ds-background-accent-blue-subtle-pressed: #adcbfb;
+  --ds-background-accent-blue-bolder: #1868db;
+  --ds-background-accent-blue-bolder-hovered: #1558bc;
+  --ds-background-accent-blue-bolder-pressed: #144794;
+  --ds-background-accent-purple-subtlest: #f8eefe;
+  --ds-background-accent-purple-subtlest-hovered: #eed7fc;
+  --ds-background-accent-purple-subtlest-pressed: #e3bdfa;
+  --ds-background-accent-purple-subtler: #eed7fc;
+  --ds-background-accent-purple-subtler-hovered: #e3bdfa;
+  --ds-background-accent-purple-subtler-pressed: #d8a0f7;
+  --ds-background-accent-purple-subtle: #c97cf4;
+  --ds-background-accent-purple-subtle-hovered: #d8a0f7;
+  --ds-background-accent-purple-subtle-pressed: #e3bdfa;
+  --ds-background-accent-purple-bolder: #964ac0;
+  --ds-background-accent-purple-bolder-hovered: #803fa5;
+  --ds-background-accent-purple-bolder-pressed: #673286;
+  --ds-background-accent-magenta-subtlest: #ffecf8;
+  --ds-background-accent-magenta-subtlest-hovered: #fdd0ec;
+  --ds-background-accent-magenta-subtlest-pressed: #fcb6e1;
+  --ds-background-accent-magenta-subtler: #fdd0ec;
+  --ds-background-accent-magenta-subtler-hovered: #fcb6e1;
+  --ds-background-accent-magenta-subtler-pressed: #f797d2;
+  --ds-background-accent-magenta-subtle: #e774bb;
+  --ds-background-accent-magenta-subtle-hovered: #f797d2;
+  --ds-background-accent-magenta-subtle-pressed: #fcb6e1;
+  --ds-background-accent-magenta-bolder: #ae4787;
+  --ds-background-accent-magenta-bolder-hovered: #943d73;
+  --ds-background-accent-magenta-bolder-pressed: #77325b;
+  --ds-background-accent-gray-subtlest: #f0f1f2;
+  --ds-background-accent-gray-subtlest-hovered: #dddee1;
+  --ds-background-accent-gray-subtlest-pressed: #b7b9be;
+  --ds-background-accent-gray-subtler: #dddee1;
+  --ds-background-accent-gray-subtler-hovered: #b7b9be;
+  --ds-background-accent-gray-subtler-pressed: #8c8f97;
+  --ds-background-accent-gray-subtle: #8c8f97;
+  --ds-background-accent-gray-subtle-hovered: #b7b9be;
+  --ds-background-accent-gray-subtle-pressed: #dddee1;
+  --ds-background-accent-gray-bolder: #6b6e76;
+  --ds-background-accent-gray-bolder-hovered: #505258;
+  --ds-background-accent-gray-bolder-pressed: #3b3d42;
+}
+
+:root {
+  --ds-background-discovery-bold: #964ac0;
+  --ds-text-selected: #1868db;
+}
+
+@layer {
+  * {
+    @apply box-border;
+  }
+}
