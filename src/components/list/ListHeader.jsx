@@ -47,6 +47,8 @@ const ListHeader = ({
     }
   }
 
+  console.log(data);
+
   return (
     <div
       className="board-list__header flex justify-between align-center"
@@ -70,7 +72,7 @@ const ListHeader = ({
             ref={titleButtonTextRef}
             className="list-title__button"
           >
-            {listTitleVal}
+            {data.title}
           </span>
         </button>
         <textarea
