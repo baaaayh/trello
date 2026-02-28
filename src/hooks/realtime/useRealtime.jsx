@@ -2,86 +2,66 @@ import { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/src/lib/supabaseClient";
 
-export const useCardsRealtime = (boardId) => {
+export const useRealtime = (boardId, userId) => {
   const queryClient = useQueryClient();
   const numericBoardId = Number(boardId);
 
   useEffect(() => {
     if (!numericBoardId) return;
 
-    const channel = supabase
-      .channel(`realtime-board-${numericBoardId}`)
+    // 💡 채널 이름에 랜덤 값을 더해 중복 충돌 방지
+    const channelName = `combined-realtime-${numericBoardId}-${Math.random().toString(36).substring(7)}`;
+    const mainChannel = supabase.channel(channelName);
+
+    mainChannel
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "boards" },
-        (payload) => {
-          console.log("boards 변경:", payload);
-          queryClient.invalidateQueries({ queryKey: ["boards"] });
-        },
-      )
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "inbox" },
-        (payload) => {
-          console.log("inbox 변경:", payload);
-          queryClient.invalidateQueries({
-            queryKey: ["listsWithCards", numericBoardId],
-          });
-          queryClient.invalidateQueries({
-            queryKey: ["inboxCards", numericBoardId],
-          });
-          if (payload.new?.id) {
-            queryClient.invalidateQueries({
-              queryKey: ["card", Number(payload.new.id)],
-            });
-          }
+        (p) => {
+          console.log("BOARD 변경 :::", p);
+          queryClient.invalidateQueries({ queryKey: ["boards", userId] });
         },
       )
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "lists" },
-        (payload) => {
-          console.log("lists 변경:", payload);
+        (p) => {
+          console.log("LIST 변경 :::", p);
           queryClient.invalidateQueries({
             queryKey: ["listsWithCards", numericBoardId],
           });
-          queryClient.invalidateQueries({
-            queryKey: ["inboxCards", numericBoardId],
-          });
-          if (payload.new?.id) {
-            queryClient.invalidateQueries({
-              queryKey: ["card", Number(payload.new.id)],
-            });
-          }
         },
       )
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "cards" },
-        (payload) => {
-          console.log("cards 변경:", payload);
+        (p) => {
+          console.log("CARD 변경 :::", p);
           queryClient.invalidateQueries({
             queryKey: ["listsWithCards", numericBoardId],
           });
           queryClient.invalidateQueries({
             queryKey: ["inboxCards", numericBoardId],
           });
-          queryClient.invalidateQueries({ queryKey: ["archivedCards"] });
-          queryClient.invalidateQueries({ queryKey: ["cards"] });
-          if (payload.new?.id) {
-            queryClient.invalidateQueries({
-              queryKey: ["card", Number(payload.new.id)],
-            });
-          }
+        },
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "inbox" },
+        (p) => {
+          console.log("INBOX 변경 :::", p);
+          queryClient.invalidateQueries({
+            queryKey: ["inboxCards", numericBoardId],
+          });
         },
       )
       .subscribe((status) => {
-        console.log("구독 상태 ::: ", status);
+        console.log(`🚀 [${channelName}] 상태 :::`, status);
       });
 
-    // 3. 컴포넌트 언마운트 시 구독 해제
     return () => {
-      supabase.removeChannel(channel);
+      console.log("🧹 채널 해제 중...");
+      supabase.removeChannel(mainChannel);
     };
-  }, [numericBoardId, queryClient]);
+  }, [numericBoardId, userId]); // eslint-disable-line
 };
