@@ -115,11 +115,7 @@ export function useBoardDnd({
       (overData?.type === "CARD" && overData?.listId === "inbox");
 
     // ── INBOX 내부 순서 변경 ──
-    if (
-      overIsInboxZone &&
-      activeContainer === INBOX_ID &&
-      originalListId.current === INBOX_ID
-    ) {
+    if (overIsInboxZone && activeContainer === INBOX_ID) {
       if (overData?.type !== "CARD") return;
 
       setBoardState((prev) => {
@@ -363,9 +359,7 @@ export function useBoardDnd({
         const cardIndex = inboxIds.indexOf(activeId);
 
         const latestInboxCards =
-          queryClient.getQueryData({
-            queryKey: ["inboxCards", Number(boardId)],
-          }) ?? [];
+          queryClient.getQueryData(["inboxCards", Number(boardId)]) ?? [];
 
         const latestInboxList = latestInboxCards.filter(
           (card) => card.id !== activeId,

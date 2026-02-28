@@ -159,7 +159,20 @@ function App() {
           (c) => c.data.current?.type === "INBOX",
         ),
       });
-      if (inboxCollision.length > 0) return inboxCollision;
+
+      if (inboxCollision.length > 0) {
+        // 인박스 내 카드 위에 있는지 먼저 확인
+        const inboxCardCollision = closestCorners({
+          ...args,
+          droppableContainers: args.droppableContainers.filter(
+            (c) =>
+              c.data.current?.type === "CARD" &&
+              c.data.current?.listId === "inbox",
+          ),
+        });
+        if (inboxCardCollision.length > 0) return inboxCardCollision;
+        return inboxCollision;
+      }
 
       return closestCorners(args);
     }
