@@ -22,48 +22,53 @@ const MoveMenu = ({ cardData, onClose }) => {
     id: cardId,
     is_inbox: initialIsInbox,
   } = cardData;
+
   const user = useAuthStore((state) => state.user);
   const moveCardMutation = useMoveCard();
+  const moveCardInInboxMutation = useMoveCardInInbox(boardId);
 
-  const [activeTab, setActiveTab] = useState("board");
+  const [activeTab, setActiveTab] = useState(
+    initialIsInbox ? "inbox" : "board",
+  );
   const [selectedBoardId, setSelectedBoardId] = useState(boardId);
   const [selectedListId, setSelectedListId] = useState(listId);
-
-  // 사용자가 명시적으로 선택한 포지션을 저장 (초기값 null)
   const [selectedBoardPosIndex, setSelectedBoardPosIndex] = useState(null);
   const [selectedInboxPosIndex, setSelectedInboxPosIndex] = useState(null);
 
-  // 선택된 보드와 리스트에 따라 데이터를 실시간으로 가져옴
+  // 데이터 fetch
   const { data: boards } = useBoards(user?.id);
   const { data: lists } = useLists(selectedBoardId);
   const { data: cardsInTargetList } = useCards(selectedBoardId, selectedListId);
   const { data: cardsInInbox } = useInboxCards(boardId);
-  const moveCardInInboxMutation = useMoveCardInInbox(boardId);
 
-  // 1. 타겟 리스트의 카드들을 정렬 (아카이브 제외)
+  // ── [분석 핵심] 1. 아카이브된 카드를 완벽히 제거한 "순수 활성 목록" 생성 ──
+  // 이 배열들이 UI와 1:1로 매칭되는 기준점이 됩니다.
   const activeCards = (cardsInTargetList || [])
     .filter((card) => !card.is_archived && !card.is_inbox)
     .sort((a, b) => a.position - b.position);
 
   const inboxActiveCards = (cardsInInbox || [])
     .filter((card) => !card.is_archived)
-    .sort((a, b) => a.position - b.position);
+    .sort(
+      (a, b) =>
+        (a.inbox_position ?? a.position) - (b.inbox_position ?? b.position),
+    );
 
-  // 2. 현재 이동하려는 카드가 타겟 리스트에 이미 있는지 확인
+  // ── 2. 현재 위치(Index) 계산 ──
+  // DB의 position 값이 아닌, 필터링된 배열에서의 "순서(index)"를 찾습니다.
   const currentIndex = activeCards.findIndex((c) => c.id === cardId);
   const currentInboxIndex = inboxActiveCards.findIndex((c) => c.id === cardId);
 
-  // 3. 포지션 옵션 개수 계산
-  // - 현재 리스트와 목적지 리스트가 같다면: 카드 개수 유지
-  // - 목적지 리스트가 다르다면: 새로운 자리가 필요하므로 +1
+  // ── 3. 포지션 옵션 개수 계산 ──
   const isSameList = selectedListId === listId && !initialIsInbox;
+
+  // 목적지 리스트에 현재 카드가 없다면 새로운 자리(+1)가 필요합니다.
   const positionCount = isSameList
     ? activeCards.length
     : activeCards.length + 1;
-
-  // console.log(positionCount);
-
-  const inboxPositionCount = inboxActiveCards.length + 1;
+  const inboxPositionCount = initialIsInbox
+    ? inboxActiveCards.length
+    : inboxActiveCards.length + 1;
 
   const positionOptions = Array.from(
     { length: Math.max(1, positionCount) },
@@ -81,7 +86,7 @@ const MoveMenu = ({ cardData, onClose }) => {
     }),
   );
 
-  // 4. 표시할 인덱스 결정 (선택값이 없으면 현재 위치 혹은 마지막 위치 자동 계산)
+  // ── 4. 표시할 인덱스(Display Index) 결정 ──
   const displayBoardPosIndex =
     selectedBoardPosIndex !== null
       ? selectedBoardPosIndex
@@ -89,7 +94,6 @@ const MoveMenu = ({ cardData, onClose }) => {
         ? currentIndex
         : activeCards.length;
 
-  // displayPosIndex (inbox 탭용)
   const displayInboxPosIndex =
     selectedInboxPosIndex !== null
       ? selectedInboxPosIndex
@@ -97,7 +101,6 @@ const MoveMenu = ({ cardData, onClose }) => {
         ? currentInboxIndex
         : inboxActiveCards.length;
 
-  // 탭 변경 시 호출
   const handleTabChange = (tab) => {
     setActiveTab(tab);
     setSelectedBoardPosIndex(null);
@@ -107,10 +110,11 @@ const MoveMenu = ({ cardData, onClose }) => {
   };
 
   const handleMove = () => {
-    // ── 케이스 1: 인박스로 이동 (진입 또는 내부 이동) ──
     if (activeTab === "inbox") {
+      // 자기 자신을 제외한 "보이는" 카드들만 calcPosition에 전달
       const otherCards = inboxActiveCards.filter((c) => c.id !== cardId);
       const newPos = calcPosition(otherCards, displayInboxPosIndex);
+
       moveCardInInboxMutation.mutate(
         {
           cardId,
@@ -119,14 +123,11 @@ const MoveMenu = ({ cardData, onClose }) => {
         },
         { onSuccess: () => onClose?.() },
       );
-    }
-    // ── 케이스 2: 보드 리스트로 이동 (복귀 또는 내부 이동) ──
-    else {
+    } else {
       const otherCards = activeCards.filter((c) => c.id !== cardId);
       const newPos = calcPosition(otherCards, displayBoardPosIndex);
 
       if (initialIsInbox) {
-        // 인박스 탈출 (Exit)
         moveCardInInboxMutation.mutate(
           {
             cardId,
@@ -137,7 +138,6 @@ const MoveMenu = ({ cardData, onClose }) => {
           { onSuccess: () => onClose?.() },
         );
       } else {
-        // 일반적인 보드 내 이동 (기존 훅 사용)
         moveCardMutation.mutate(
           {
             cardId,
@@ -151,7 +151,6 @@ const MoveMenu = ({ cardData, onClose }) => {
     }
   };
 
-  // Select 컴포넌트 공통 스타일
   const customStyles = {
     control: (base) => ({
       ...base,
@@ -267,7 +266,7 @@ const MoveMenu = ({ cardData, onClose }) => {
                       }
                       onChange={(opt) => {
                         setSelectedListId(opt.value);
-                        setSelectedBoardPosIndex(null); // ✅ 리스트가 바뀌면 사용자가 선택한 포지션을 초기화하여 목록 갱신을 유도
+                        setSelectedBoardPosIndex(null);
                       }}
                       placeholder="Select List"
                       styles={customStyles}
@@ -278,7 +277,6 @@ const MoveMenu = ({ cardData, onClose }) => {
                     <strong className="text-sm text-gray-600">Position</strong>
                     <Select
                       options={positionOptions}
-                      // displayPosIndex를 통해 실시간으로 계산된 값을 보여줌
                       value={
                         positionOptions.find(
                           (o) => o.value === displayBoardPosIndex,
@@ -299,10 +297,14 @@ const MoveMenu = ({ cardData, onClose }) => {
         <div className="mt-6">
           <button
             onClick={handleMove}
-            className="w-full py-2 font-bold text-white bg-[#0c66e4] hover:bg-[#1558BC] rounded-md transition-all"
-            disabled={moveCardMutation.isPending}
+            className="w-full py-2 font-bold text-white bg-[#0c66e4] hover:bg-[#1558BC] rounded-md transition-all disabled:opacity-50"
+            disabled={
+              moveCardMutation.isPending || moveCardInInboxMutation.isPending
+            }
           >
-            {moveCardMutation.isPending ? "Moving..." : "Move"}
+            {moveCardMutation.isPending || moveCardInInboxMutation.isPending
+              ? "Moving..."
+              : "Move"}
           </button>
         </div>
       </div>

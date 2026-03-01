@@ -1,7 +1,10 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useMemo } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useCardDetail } from "@/src/hooks/card/useCardDetail";
 import { useChangeCardDetail } from "@/src/hooks/card/useChangeCardDetail";
+import { useCardLogs } from "@/src/hooks/card/useCardLogs";
+import { useCardComments } from "@/src/hooks/card/useCardComments";
+import ModalActivity from "@/src/components/common/modal/ModalActivity";
 import GalleryIcon from "@/src/components/common/icons/GalleryIcon";
 import CloseIcon from "@/src/components/common/icons/CloseIcon";
 import TextIcon from "@/src/components/common/icons/TextIcon";
@@ -28,6 +31,16 @@ const Modal = () => {
     Number(listId),
     Number(cardId),
   );
+
+  const { data: logs, isLoading: cardActivityLoading } = useCardLogs(cardId);
+  const { data: comments, isLoading: commentsLoading } =
+    useCardComments(cardId);
+
+  const timeline = useMemo(() => {
+    return [...(logs ?? []), ...(comments ?? [])].sort(
+      (a, b) => new Date(b.created_at) - new Date(a.created_at),
+    );
+  }, [logs, comments]);
 
   const handleClose = () => {
     navigate(`/board/${boardId}/${boardSlug}`);
@@ -114,7 +127,7 @@ const Modal = () => {
                     key={cardId + (title || "")}
                     name="titleTextArea"
                     id="titleTextArea"
-                    className="desc-area__title flex-100 px-1 py-2 text-[28px] font-bold"
+                    className="desc-area__title flex-100 px-1 py-2 text-[28px] font-bold resize-none"
                     defaultValue={title}
                     onChange={(e) => {
                       setTitleTextAreaVal(e.target.value);
@@ -194,7 +207,7 @@ const Modal = () => {
                           value={textAreaVal}
                           onChange={(e) => setTextAreaVal(e.target.value)}
                           placeholder="Need formatting help? Type /help."
-                          className="w-full"
+                          className="w-full h-22 p-3 border border-[#8C8F97] resize-none"
                         ></textarea>
                         <div className="textarea-buttons">
                           <ul className="flex justify-left items-center gap-x-2">
@@ -231,7 +244,18 @@ const Modal = () => {
                   </div>
                 </div>
               </div>
-              <div className="comment-area flex-50"></div>
+              <div className="comment-area flex-50 bg-[#f8f8f8] border-l border-l-[#0B120E24] max-h-[600px] overflow-y-auto">
+                {cardActivityLoading || commentsLoading ? (
+                  <p>Loading...</p>
+                ) : (
+                  <ModalActivity
+                    timeline={timeline}
+                    boardId={boardId}
+                    listId={listId}
+                    cardId={cardId}
+                  />
+                )}
+              </div>
             </div>
           </div>
         </div>

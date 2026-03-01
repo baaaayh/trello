@@ -13,6 +13,13 @@ export const useMoveCard = () => {
       isInbox,
       inboxPosition,
     }) => {
+      // 이동 전 카드 정보 (from 정보 로그용)
+      const { data: oldCard } = await supabase
+        .from("cards")
+        .select("list_id, board_id, position, title")
+        .eq("id", cardId)
+        .single();
+
       const { data, error } = await supabase
         .from("cards")
         .update({
@@ -24,10 +31,57 @@ export const useMoveCard = () => {
         })
         .eq("id", cardId)
         .select();
+
       if (error) throw error;
+
+      // ✅ 로그
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (isInbox) {
+        await supabase.from("activity_logs").insert({
+          user_id: user.id,
+          board_id: destinationBoardId,
+          list_id: destinationListId,
+          card_id: cardId,
+          action: "card.inbox.in",
+          metadata: { title: oldCard.title },
+        });
+      } else {
+        // list 이름도 같이 남기면 UI 표시에 유용
+        const { data: lists } = await supabase
+          .from("lists")
+          .select("id, title")
+          .in(
+            "id",
+            [oldCard.list_id, Number(destinationListId)].filter(Boolean),
+          );
+
+        const fromList = lists?.find((l) => l.id === oldCard.list_id);
+        const toList = lists?.find((l) => l.id === destinationListId);
+
+        await supabase.from("activity_logs").insert({
+          user_id: user.id,
+          board_id: Number(destinationBoardId), // ✅ Number로 변환
+          list_id: Number(destinationListId), // ✅ Number로 변환
+          card_id: Number(cardId), // ✅ Number로 변환
+          action:
+            oldCard.list_id === destinationListId
+              ? "card.reordered"
+              : "card.moved",
+          metadata: {
+            title: oldCard.title,
+            from_list_id: oldCard.list_id,
+            from_list_title: fromList?.title ?? null,
+            to_list_id: destinationListId,
+            to_list_title: toList?.title ?? null,
+          },
+        });
+      }
+
       return data;
     },
-
     onMutate: async (variables) => {
       const {
         cardId,
@@ -85,7 +139,6 @@ export const useMoveCard = () => {
 
       return { previousLists, previousInbox, destinationBoardId };
     },
-
     onError: (err, variables, context) => {
       // 에러 발생 시 이전 상태로 롤백
       if (context?.previousLists) {
@@ -101,17 +154,17 @@ export const useMoveCard = () => {
         );
       }
     },
-
     onSettled: (data, error, variables) => {
       // 성공/실패 여부와 상관없이 서버와 동기화
-      queryClient.invalidateQueries([
-        "listsWithCards",
-        Number(variables.destinationBoardId),
-      ]);
-      queryClient.invalidateQueries([
-        "inboxCards",
-        Number(variables.destinationBoardId),
-      ]);
+      queryClient.invalidateQueries({
+        queryKey: ["listsWithCards", Number(variables.destinationBoardId)],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["inboxCards", Number(variables.destinationBoardId)],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["activityLogs", "card", Number(variables.cardId)],
+      });
     },
   });
 };

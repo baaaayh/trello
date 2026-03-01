@@ -22,16 +22,14 @@ export const useRealtime = (boardId, userId) => {
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "boards" },
-        (p) => {
-          console.log("BOARD 변경 :::", p);
+        () => {
           queryClient.invalidateQueries({ queryKey: ["boards", userId] });
         },
       )
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "lists" },
-        (p) => {
-          console.log("LIST 변경 :::", p);
+        () => {
           queryClient.invalidateQueries({
             queryKey: ["listsWithCards", numericBoardId],
             refetchType: "all",
@@ -65,8 +63,7 @@ export const useRealtime = (boardId, userId) => {
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "inbox" },
-        (p) => {
-          console.log("INBOX 변경 :::", p);
+        () => {
           queryClient.invalidateQueries({
             queryKey: ["inboxCards", numericBoardId],
           });

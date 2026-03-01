@@ -41,6 +41,19 @@ export const useAddCard = (boardId, listId) => {
         .single();
 
       if (error) throw error;
+
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      await supabase.from("activity_logs").insert({
+        user_id: user.id,
+        board_id: numericBoardId,
+        list_id: numericListId,
+        card_id: data.id,
+        action: "card.created",
+        metadata: { title },
+      });
+
       return data;
     },
     onMutate: async ({ title }) => {
@@ -89,9 +102,12 @@ export const useAddCard = (boardId, listId) => {
         queryClient.setQueryData(context.queryKey, context.previousLists);
       }
     },
-    onSettled: () => {
+    onSettled: (data) => {
       queryClient.invalidateQueries({
         queryKey: ["listsWithCards", numericBoardId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["activityLogs", "card", Number(data?.id)],
       });
     },
   });

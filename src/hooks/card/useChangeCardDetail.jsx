@@ -14,6 +14,13 @@ export const useChangeCardDetail = (boardId, listId, cardId) => {
       if (isComplete !== undefined) updatedData.is_complete = isComplete;
       if (isArchived !== undefined) updatedData.is_archived = isArchived;
 
+      // 변경 전 값 가져오기 (old 값 로그용)
+      const { data: oldCard } = await supabase
+        .from("cards")
+        .select("title, desc, is_complete, is_archived")
+        .eq("id", numericCardId)
+        .single();
+
       const { data, error } = await supabase
         .from("cards")
         .update(updatedData)
@@ -22,6 +29,45 @@ export const useChangeCardDetail = (boardId, listId, cardId) => {
         .single();
 
       if (error) throw error;
+
+      // ✅ 어떤 필드가 바뀌었는지에 따라 action 분기
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      const logs = [];
+
+      if (titleVal !== undefined)
+        logs.push({
+          action: "card.updated.title",
+          metadata: { old: oldCard.title, new: titleVal },
+        });
+      if (descVal !== undefined)
+        logs.push({
+          action: "card.updated.desc",
+          metadata: { old: oldCard.desc, new: descVal },
+        });
+      if (isComplete !== undefined)
+        logs.push({
+          action: isComplete ? "card.completed" : "card.uncompleted",
+          metadata: {},
+        });
+      if (isArchived !== undefined)
+        logs.push({
+          action: isArchived ? "card.archived" : "card.unarchived",
+          metadata: {},
+        });
+
+      if (logs.length > 0) {
+        await supabase.from("activity_logs").insert(
+          logs.map((log) => ({
+            user_id: user.id,
+            board_id: numericBoardId,
+            card_id: numericCardId,
+            ...log,
+          })),
+        );
+      }
+
       return data;
     },
     onMutate: async (newValues) => {
@@ -102,6 +148,9 @@ export const useChangeCardDetail = (boardId, listId, cardId) => {
       });
       queryClient.invalidateQueries({
         queryKey: ["archivedCards"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["activityLogs", "card", numericCardId],
       });
     },
   });

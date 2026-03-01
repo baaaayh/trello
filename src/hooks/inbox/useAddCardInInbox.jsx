@@ -52,9 +52,19 @@ export const useAddCardInInbox = (boardId) => {
 
       if (inboxError) throw inboxError;
 
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      await supabase.from("activity_logs").insert({
+        user_id: user.id,
+        board_id: numericBoardId,
+        card_id: newCard.id,
+        action: "card.created.inbox",
+        metadata: { title },
+      });
+
       return newCard;
     },
-
     onMutate: async ({ title }) => {
       const queryKey = ["inboxCards", numericBoardId];
       await queryClient.cancelQueries({ queryKey });
@@ -70,6 +80,7 @@ export const useAddCardInInbox = (boardId) => {
         id: Date.now(), // 임시 클라이언트 사이드 ID
         title,
         board_id: numericBoardId,
+        list_id: "INBOX",
         is_inbox: true,
         inbox_position: optimisticPosition,
         position: 0,
@@ -83,18 +94,21 @@ export const useAddCardInInbox = (boardId) => {
 
       return { previousCards, queryKey };
     },
-
     onError: (error, variables, context) => {
       if (context?.previousCards) {
         queryClient.setQueryData(context.queryKey, context.previousCards);
       }
       console.error("인박스 카드 추가 실패:", error.message);
     },
-
-    onSettled: () => {
+    onSettled: (data) => {
       queryClient.invalidateQueries({
         queryKey: ["inboxCards", numericBoardId],
       });
+      if (data?.id) {
+        queryClient.invalidateQueries({
+          queryKey: ["activityLogs", "card", data.id],
+        });
+      }
     },
   });
 };

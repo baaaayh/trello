@@ -122,11 +122,11 @@ const BoardContainer = ({ user, data }) => {
           <div className="flex-1 relative">
             <div
               ref={scrollRef}
-              className="h-full overflow-x-scroll overflow-y-hidden"
+              className="board-scroll h-full overflow-x-scroll overflow-y-hidden"
               style={{ scrollbarWidth: "none" }}
             >
               <style>{`
-                div::-webkit-scrollbar { display: none; }
+                .board-scroll::-webkit-scrollbar { display: none; }
               `}</style>
 
               <div

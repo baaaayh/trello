@@ -91,7 +91,7 @@ const Card = ({ data, boardSlug, isInbox }) => {
         onContextMenu={handleContextMenu}
       >
         <Link
-          to={`/card/${boardId}/${listId}/${cardId}`}
+          to={`/card/${boardId}/${isInbox ? "INBOX" : listId}/${cardId}`}
           state={{ backgroundLocation: location, boardSlug }}
           className="block p-2 bg-white group"
         >

@@ -470,6 +470,7 @@ export function useBoardDnd({
       moveCardMutation.mutate(
         {
           cardId: activeId,
+          destinationBoardId: boardId,
           destinationListId: toListId,
           newPosition: calcPosition(toListCardsWithoutSelf, finalCardIndex),
         },

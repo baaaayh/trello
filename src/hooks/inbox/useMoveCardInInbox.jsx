@@ -13,47 +13,92 @@ export const useMoveCardInInbox = (boardId) => {
       inboxPosition,
       type,
     }) => {
-      // type: 'ENTER_INBOX' | 'MOVE_WITHIN_INBOX' | 'EXIT_INBOX'
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      // 로그용 카드 정보 미리 조회
+      const { data: cardInfo } = await supabase
+        .from("cards")
+        .select("title, list_id, board_id")
+        .eq("id", cardId)
+        .single();
+
       if (type === "ENTER_INBOX") {
-        // 1. cards 테이블의 list_id 제거 및 is_inbox를 true로 설정
         await supabase
           .from("cards")
-          .update({
-            // list_id: null,
-            is_inbox: true, // ✅ 보드에서 인박스로 들어갈 때 true
-            inbox_position: newPosition,
-          })
+          .update({ is_inbox: true, inbox_position: newPosition })
           .eq("id", cardId);
 
-        // 2. inbox 테이블에 레코드 추가
-        return await supabase
+        const result = await supabase
           .from("inbox")
           .insert({ card_id: cardId, position: newPosition });
+
+        // ✅ 로그
+        await supabase.from("activity_logs").insert({
+          user_id: user.id,
+          board_id: numericBoardId,
+          list_id: cardInfo?.list_id,
+          card_id: cardId,
+          action: "card.inbox.transferred.in",
+          metadata: { title: cardInfo?.title },
+        });
+
+        return result;
       }
 
       if (type === "MOVE_WITHIN_INBOX") {
-        // inbox 테이블 내 순서(position)만 변경 (is_inbox는 이미 true이므로 수정 불필요)
         const result = await supabase
           .from("inbox")
           .update({ position: newPosition })
           .eq("card_id", cardId);
+
+        // ✅ 로그
+        await supabase.from("activity_logs").insert({
+          user_id: user.id,
+          board_id: numericBoardId,
+          card_id: cardId,
+          action: "card.inbox.transferred.inner",
+          metadata: { title: cardInfo?.title, new_position: newPosition },
+        });
+
         return result;
       }
 
       if (type === "EXIT_INBOX") {
-        // 1. inbox 테이블에서 레코드 제거
         await supabase.from("inbox").delete().eq("card_id", cardId);
 
-        // 2. cards 테이블에 list_id 부여 및 is_inbox를 false로 설정
-        return await supabase
+        const result = await supabase
           .from("cards")
           .update({
             list_id: destinationListId,
             position: newPosition,
             inbox_position: inboxPosition,
-            is_inbox: false, // ✅ 인박스에서 나갈 때 false
+            is_inbox: false,
           })
           .eq("id", cardId);
+
+        // 목적지 list 이름 조회
+        const { data: listInfo } = await supabase
+          .from("lists")
+          .select("title")
+          .eq("id", destinationListId)
+          .single();
+
+        // ✅ 로그
+        await supabase.from("activity_logs").insert({
+          user_id: user.id,
+          board_id: numericBoardId,
+          list_id: destinationListId,
+          card_id: cardId,
+          action: "card.inbox.transferred.out",
+          metadata: {
+            title: cardInfo?.title,
+            to_list_id: destinationListId,
+            to_list_title: listInfo?.title ?? null,
+          },
+        });
+        return result;
       }
     },
     onMutate: async ({ cardId, destinationListId, newPosition, type }) => {
@@ -152,13 +197,15 @@ export const useMoveCardInInbox = (boardId) => {
         );
       }
     },
-
-    onSettled: () => {
+    onSettled: (data, error, variables) => {
       queryClient.invalidateQueries({
         queryKey: ["listsWithCards", numericBoardId],
       });
       queryClient.invalidateQueries({
         queryKey: ["inboxCards", numericBoardId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["activityLogs", "card", Number(variables.cardId)],
       });
     },
   });
