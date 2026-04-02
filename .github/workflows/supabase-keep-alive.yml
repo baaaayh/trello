@@ -2,8 +2,7 @@ name: Supabase Keep Alive
 
 on:
   schedule:
-    # 3일마다 한 번씩 실행 (한국 시간 기준 오전 9시경)
-    - cron: '0 0 */3 * *'
+    - cron: '0 0 */3 * *' # 3일마다 자동 실행
   workflow_dispatch: # 수동 실행 버튼 활성화
 
 jobs:
@@ -12,7 +11,8 @@ jobs:
     steps:
       - name: Ping Supabase Database
         run: |
-          curl -X POST "${{ secrets.VITE_SUPABASE_URL }}/rest/v1/rpc/keep_alive_ping" \
-          -H "apikey: ${{ secrets.VITE_SUPABASE_ANON_KEY }}" \
-          -H "Authorization: Bearer ${{ secrets.VITE_SUPABASE_ANON_KEY }}" \
+          # -v 옵션을 추가하여 상세 로그를 출력합니다.
+          curl -v -X POST "${{ secrets.SUPABASE_URL }}/rest/v1/rpc/keep_alive_ping" \
+          -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
+          -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}" \
           -H "Content-Type: application/json"
