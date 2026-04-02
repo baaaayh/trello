@@ -11,8 +11,7 @@ jobs:
     steps:
       - name: Ping Supabase Database
         run: |
-          # -v 옵션을 추가하여 상세 로그를 출력합니다.
-          curl -v -X POST "${{ secrets.SUPABASE_URL }}/rest/v1/rpc/keep_alive_ping" \
-          -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
-          -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}" \
+          curl -v -X POST "${{ secrets.VITE_SUPABASE_URL }}/rest/v1/rpc/keep_alive_ping" \
+          -H "apikey: ${{ secrets.VITE_SUPABASE_ANON_KEY }}" \
+          -H "Authorization: Bearer ${{ secrets.VITE_SUPABASE_ANON_KEY }}" \
           -H "Content-Type: application/json"
